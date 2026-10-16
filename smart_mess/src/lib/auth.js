@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required');
+          return null;
         }
 
         await connectDB();
@@ -23,7 +23,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const user = await User.findOne({ email: credentials.email.toLowerCase() }).select('+password');
 
         if (!user) {
-          throw new Error('No user found with this email');
+          console.warn(`[auth] User not found with email: ${credentials.email}`);
+          return null;
         }
 
         if (!user.isActive) {
@@ -33,7 +34,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error('Invalid password');
+          console.warn(`[auth] Invalid password for email: ${credentials.email}`);
+          return null;
         }
 
         return {

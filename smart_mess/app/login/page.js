@@ -12,13 +12,35 @@ function LoginForm() {
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState('');
+  const [seedSuccess, setSeedSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  async function handleSeed() {
+    setSeeding(true);
+    setError('');
+    setSeedSuccess('');
+    try {
+      const res = await fetch('/api/seed', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setSeedSuccess('Demo database seeded successfully! You can now sign in.');
+      } else {
+        setError(data.error || 'Failed to seed database.');
+      }
+    } catch {
+      setError('Unable to reach seed endpoint. Ensure server is running.');
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSeedSuccess('');
 
     const result = await signIn('credentials', {
       email: formData.email.trim().toLowerCase(),
@@ -27,7 +49,11 @@ function LoginForm() {
     });
 
     if (result?.error) {
-      setError(result.error === 'CredentialsSignin' ? 'Invalid email or password.' : result.error);
+      if (result.error === 'CredentialsSignin' || result.error === 'CallbackRouteError') {
+        setError('Invalid email or password. If you have not initialized demo data yet, click "Seed Demo Data" below.');
+      } else {
+        setError(result.error);
+      }
       setLoading(false);
       return;
     }
@@ -62,6 +88,16 @@ function LoginForm() {
 
       {/* Card */}
       <div className="glass p-8 shadow-2xl">
+        {seedSuccess && (
+          <div className="mb-5 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            {seedSuccess}
+          </div>
+        )}
+
         {error && (
           <div className="mb-5 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -166,6 +202,26 @@ function LoginForm() {
           ))}
         </div>
         <p className="text-xs text-slate-600 text-center mt-2">All demo passwords: <code className="text-slate-400">password123</code></p>
+        
+        <div className="mt-3 pt-3 border-t border-slate-700/50 flex items-center justify-between">
+          <span className="text-xs text-slate-400">First time setup?</span>
+          <button
+            type="button"
+            id="seed-demo-btn"
+            onClick={handleSeed}
+            disabled={seeding}
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-medium flex items-center gap-1.5 py-1 px-2.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30"
+          >
+            {seeding ? (
+              <>
+                <div className="spinner w-3 h-3 border-indigo-400/30 border-t-indigo-400" />
+                <span>Seeding database...</span>
+              </>
+            ) : (
+              <span>⚡ Seed Demo Data</span>
+            )}
+          </button>
+        </div>
       </div>
 
       <p className="text-center text-slate-600 text-xs mt-6">
