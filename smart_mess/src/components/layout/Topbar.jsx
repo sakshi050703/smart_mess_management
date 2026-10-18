@@ -13,11 +13,7 @@ function getRoleConfig(role) {
       badge: 'ADMIN',
       color: 'from-indigo-500 to-purple-600',
       badgeBg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-      links: [
-        { href: '/admin-manager/settings', label: 'Mess Settings', icon: '⚙️' },
-        { href: '/admin-manager/users', label: 'Staff & Users', icon: '👥' },
-        { href: '/admin-manager/audit-logs', label: 'Audit Logs', icon: '🔍' },
-      ],
+      links: [],
     };
   }
   if (r === 'manager') {
@@ -26,11 +22,7 @@ function getRoleConfig(role) {
       badge: 'MANAGER',
       color: 'from-indigo-500 to-purple-600',
       badgeBg: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-      links: [
-        { href: '/admin-manager', label: 'Overview Dashboard', icon: '⊞' },
-        { href: '/admin-manager/menus', label: 'Daily Menus', icon: '📋' },
-        { href: '/admin-manager/settings', label: 'Mess Settings', icon: '⚙️' },
-      ],
+      links: [],
     };
   }
   if (r === 'kitchen') {
@@ -39,11 +31,7 @@ function getRoleConfig(role) {
       badge: 'KITCHEN',
       color: 'from-emerald-500 to-teal-600',
       badgeBg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-      links: [
-        { href: '/kitchen', label: 'Kitchen Overview', icon: '⊞' },
-        { href: '/kitchen/preparation', label: 'Preparation Guide', icon: '👨‍🍳' },
-        { href: '/kitchen/tasks', label: 'Tasks & Checklist', icon: '📋' },
-      ],
+      links: [],
     };
   }
   return {
@@ -51,11 +39,7 @@ function getRoleConfig(role) {
     badge: 'STUDENT',
     color: 'from-amber-500 to-orange-600',
     badgeBg: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    links: [
-      { href: '/student/profile', label: 'My Profile', icon: '👤' },
-      { href: '/student/bookings', label: 'My Bookings', icon: '✅' },
-      { href: '/student/subscription', label: 'My Subscription', icon: '📅' },
-    ],
+    links: [],
   };
 }
 
@@ -169,30 +153,6 @@ export default function Topbar({ title, subtitle, role, userName }) {
           )}
         </Link>
 
-        {/* Quick direct Logout button on navbar */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600/90 border border-rose-500/20 hover:border-rose-500/40 transition-all duration-150 active:scale-95 shadow-sm group/btn cursor-pointer"
-          title="Sign Out of SmartMess"
-          aria-label="Logout"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-3.5 h-3.5 text-rose-400 group-hover/btn:text-white group-hover/btn:translate-x-0.5 transition-all duration-150"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span className="hidden sm:inline font-medium">
-            {isLoggingOut ? 'Signing out...' : 'Logout'}
-          </span>
-        </button>
-
         {/* User avatar & Profile menu with on-hover logout dropdown */}
         <div
           ref={dropdownRef}
@@ -247,7 +207,7 @@ export default function Topbar({ title, subtitle, role, userName }) {
 
           {/* On-Hover Dropdown Menu */}
           {dropdownOpen && (
-            <div className="absolute right-0 top-full pt-1.5 z-50 w-72 origin-top-right animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="absolute right-0 top-full pt-1.5 z-50 w-64 origin-top-right animate-in fade-in slide-in-from-top-1 duration-150">
               <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 shadow-2xl rounded-2xl p-2.5 ring-1 ring-white/10 text-slate-200">
                 {/* User Info Header */}
                 <div className="p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/40 mb-2">
@@ -273,28 +233,27 @@ export default function Topbar({ title, subtitle, role, userName }) {
                   </div>
                 </div>
 
-                {/* Quick Navigation Links */}
-                <div className="space-y-0.5 py-1">
-                  {roleConfig.links.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors"
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <span className="text-sm">{link.icon}</span>
-                        <span>{link.label}</span>
-                      </span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Divider */}
-                <div className="my-1.5 border-t border-slate-800/80" />
+                {/* Optional custom links if any non-sidebar item is present */}
+                {roleConfig.links && roleConfig.links.length > 0 && (
+                  <div className="space-y-0.5 py-1 mb-1.5 border-b border-slate-800/80">
+                    {roleConfig.links.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors"
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <span className="text-sm">{link.icon}</span>
+                          <span>{link.label}</span>
+                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
                 {/* Prominent Dropdown Logout Button */}
                 <button

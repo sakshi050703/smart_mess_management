@@ -101,59 +101,62 @@ export default function MenuClient({ userName, role }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activeMenu.meals?.map(meal => (
-              <div key={meal.mealType} className="glass-card p-6 rounded-2xl border border-white/5 flex flex-col justify-between space-y-4">
-                <div>
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
-                    <h3 className="text-lg font-bold text-white capitalize flex items-center gap-2">
-                      <Utensils className="w-5 h-5 text-indigo-400" />
-                      {meal.mealType}
-                    </h3>
-                    <span className="text-xs text-slate-400 flex items-center gap-1 font-mono">
-                      <Clock className="w-3.5 h-3.5" />
-                      {meal.timing?.start || '07:30'} - {meal.timing?.end || '09:30'}
-                    </span>
-                  </div>
+            {activeMenu.meals?.map((meal, idx) => {
+              const mealType = meal.mealType || meal.type;
+              return (
+                <div key={mealType || idx} className="glass-card p-6 rounded-2xl border border-white/5 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
+                      <h3 className="text-lg font-bold text-white capitalize flex items-center gap-2">
+                        <Utensils className="w-5 h-5 text-indigo-400" />
+                        {mealType}
+                      </h3>
+                      <span className="text-xs text-slate-400 flex items-center gap-1 font-mono">
+                        <Clock className="w-3.5 h-3.5" />
+                        {meal.timing?.start || meal.startTime || '07:30'} - {meal.timing?.end || meal.endTime || '09:30'}
+                      </span>
+                    </div>
 
-                  <p className="text-xs text-slate-400 mb-3">
-                    Cutoff time to skip or book: <span className="text-indigo-300 font-mono">{meal.cutoffTime || '1 hour before'}</span>
-                  </p>
+                    <p className="text-xs text-slate-400 mb-3">
+                      Cutoff time to skip or book: <span className="text-indigo-300 font-mono">{meal.cutoffTime || '1 hour before'}</span>
+                    </p>
 
-                  <div className="space-y-2">
-                    <h4 className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Served Items</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {meal.items?.map((item, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between">
-                          <span className="text-sm text-white font-medium">{item.name}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                            item.category === 'veg' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
-                          }`}>
-                            {item.category || 'Veg'}
-                          </span>
-                        </div>
-                      ))}
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase font-semibold text-slate-400 tracking-wider">Served Items</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {meal.items?.map((item, itemIdx) => (
+                          <div key={item._id || item.name || itemIdx} className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between">
+                            <span className="text-sm text-white font-medium">{item.name}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
+                              item.category === 'veg' || item.isVeg !== false ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+                            }`}>
+                              {item.category || (item.isVeg !== false ? 'Veg' : 'Non-Veg')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-3 pt-3 border-t border-white/5">
-                  <button
-                    onClick={() => handleBooking(meal.mealType, 'confirmed')}
-                    disabled={bookingLoading}
-                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
-                  >
-                    <CheckCircle className="w-4 h-4" /> Book Meal
-                  </button>
-                  <button
-                    onClick={() => handleBooking(meal.mealType, 'skipped')}
-                    disabled={bookingLoading}
-                    className="flex-1 py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
-                  >
-                    <XCircle className="w-4 h-4" /> Skip Meal
-                  </button>
+                  <div className="flex items-center gap-3 pt-3 border-t border-white/5">
+                    <button
+                      onClick={() => handleBooking(mealType, 'confirmed')}
+                      disabled={bookingLoading}
+                      className="flex-1 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <CheckCircle className="w-4 h-4" /> Book Meal
+                    </button>
+                    <button
+                      onClick={() => handleBooking(mealType, 'skipped')}
+                      disabled={bookingLoading}
+                      className="flex-1 py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <XCircle className="w-4 h-4" /> Skip Meal
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

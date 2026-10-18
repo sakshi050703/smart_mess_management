@@ -47,7 +47,7 @@ const studentNavItems = [
   { href: '/student/feedback', icon: '⭐', label: 'Feedback' },
   { href: '/student/complaints', icon: '📢', label: 'Complaints' },
   { href: '/student/notifications', icon: '🔔', label: 'Notifications' },
-  { href: '/student/profile', icon: '👤', label: 'Profile' },
+  { href: '/student/profile', icon: '👤', label: 'Student Profile' },
 ];
 
 function getRoleConfig(role) {
