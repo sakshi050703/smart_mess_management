@@ -4,8 +4,10 @@ import connectDB from './mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { getDefaultRoute } from './permissions';
+import { authConfig } from './auth.config';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       name: 'Credentials',
@@ -48,33 +50,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.studentId = user.studentId;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.studentId = token.studentId;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/login',
-    error: '/login',
-  },
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours
   },
-  secret: process.env.AUTH_SECRET,
 });
 
 /**
