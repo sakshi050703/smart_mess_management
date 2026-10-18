@@ -51,6 +51,8 @@ function LoginForm() {
     if (result?.error) {
       if (result.error === 'CredentialsSignin' || result.error === 'CallbackRouteError') {
         setError('Invalid email or password. If you have not initialized demo data yet, click "Seed Demo Data" below.');
+      } else if (result.error === 'Configuration') {
+        setError('Authentication configuration error. Please verify MongoDB Atlas IP whitelist (0.0.0.0/0) and environment variables.');
       } else {
         setError(result.error);
       }

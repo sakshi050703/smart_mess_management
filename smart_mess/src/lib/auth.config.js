@@ -4,6 +4,7 @@
  * so that it can run safely in Vercel Edge Middleware.
  */
 export const authConfig = {
+  trustHost: true,
   pages: {
     signIn: '/login',
     error: '/login',
@@ -27,5 +28,5 @@ export const authConfig = {
     },
   },
   providers: [],
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || '9f8c6b2a4e1d3c5f7a9b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d9e1f',
 };
