@@ -20,33 +20,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        await connectDB();
+        try {
+          await connectDB();
 
-        const user = await User.findOne({ email: credentials.email.toLowerCase() }).select('+password');
+          const user = await User.findOne({ email: credentials.email.toLowerCase() }).select('+password');
 
-        if (!user) {
-          console.warn(`[auth] User not found with email: ${credentials.email}`);
+          if (!user) {
+            console.warn(`[auth] User not found with email: ${credentials.email}`);
+            return null;
+          }
+
+          if (!user.isActive) {
+            console.warn(`[auth] Account deactivated for: ${credentials.email}`);
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+          if (!isPasswordValid) {
+            console.warn(`[auth] Invalid password for email: ${credentials.email}`);
+            return null;
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            studentId: user.studentId?.toString() || null,
+          };
+        } catch (authError) {
+          console.error('[auth] Authentication error in authorize():', authError);
           return null;
         }
-
-        if (!user.isActive) {
-          throw new Error('Account is deactivated. Please contact admin.');
-        }
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          console.warn(`[auth] Invalid password for email: ${credentials.email}`);
-          return null;
-        }
-
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          studentId: user.studentId?.toString() || null,
-        };
       },
     }),
   ],
